@@ -28,16 +28,26 @@ class Particle:
         self.position_i=[]          # particle position
         self.velocity_i=[]          # particle velocity
         self.pos_best_i=[]          # best position individual
-        self.score_best_i=-1        # best error individual
+        self.score_best_i=-1        # best score individual
         self.score_i=-1             # score individual
 
         for i in range(0,num_dimensions):
             self.velocity_i.append(random.uniform(-1,1))
-            self.position_i.append(random.random())
+            self.position_i.append(random.random())         # generates numbers betweem 0 and 1
 
     # evaluate current fitness
-    def evaluate(self,costFunc):
-        self.score_i=costFunc(self.position_i)
+    def evaluate(self):
+        #
+        # TO DO:
+        # call pac.runGames and run the game with this particle's parameters
+        #
+        # base = ["-p", "PacmanQAgent", "-x", "2000", "-n", "2010", "-l", "smallGrid", "-a"]
+        # base.append("epsilon=0.1,alpha=0.3,gamma=0.7")
+
+        # args = pac.readCommand( base ) # Get game components based on input    
+        # averageScore = pac.runGames( **args )
+
+        self.score_i=averageScore      # save the averageScore this iteration had
 
         # check to see if the current position is an individual best
         if self.score_i<self.score_best_i or self.score_best_i==-1:
@@ -72,11 +82,11 @@ class Particle:
                 self.position_i[i]=bounds[i][0]
         
 class PSO():
-    def __init__(self, costFunc, x0, bounds, num_particles, maxiter, verbose=False):
+    def __init__(self, numDims, bounds, num_particles, maxiter, verbose=False):
         global num_dimensions
 
-        num_dimensions=len(x0)
-        err_best_g=-1                   # best error for group
+        num_dimensions=numDims
+        score_best_g=-1                 # best score for group
         pos_best_g=[]                   # best position for group
 
         # establish the swarm
@@ -87,15 +97,16 @@ class PSO():
         # begin optimization loop
         i=0
         while i<maxiter:
-            if verbose: print(f'iter: {i:>4d}, best solution: {err_best_g:10.6f}')
+            if verbose: print(f'iter: {i:>4d}, best solution: {score_best_g:10.6f}')
             # cycle through particles in swarm and evaluate fitness
             for j in range(0,num_particles):
-                swarm[j].evaluate(costFunc)
+                # here we ask the particle to run his values in the game
+                swarm[j].evaluate()
 
                 # determine if current particle is the best (globally)
-                if swarm[j].score_i<err_best_g or err_best_g==-1:
+                if swarm[j].score_i<score_best_g or score_best_g==-1:
                     pos_best_g=list(swarm[j].position_i)
-                    err_best_g=float(swarm[j].score_i)
+                    score_best_g=float(swarm[j].score_i)
             
             # cycle through swarm and update velocities and position
             for j in range(0,num_particles):
@@ -106,7 +117,7 @@ class PSO():
         # print final results
         print('\nFINAL SOLUTION:')
         print(f'   > {pos_best_g}')
-        print(f'   > {err_best_g}\n')
+        print(f'   > {score_best_g}\n')
 
 if __name__ == "__PSO__":
     main()
@@ -115,17 +126,17 @@ if __name__ == "__PSO__":
 
 if __name__ == '__main__':
 
-    initial=[5,5]               # initial starting location [x1,x2...]
-    bounds=[(-10,10),(-10,10)]  # input bounds [(x1_min,x1_max),(x2_min,x2_max)...]
-    PSO(func1, initial, bounds, num_particles=15, maxiter=30, verbose=True)
+    numDims = 3  # number of paremeters to optimize
+    bounds=[(0,1),(0,1),(0,1)]  # input bounds [(epsilon_min,epsilon_max),(alpha_min,alpha_max),(gamma_min,gamma_max)]
+    PSO(numDims, bounds, num_particles=15, maxiter=30, verbose=True)
 
     """
     Used to start a game, with pacman module
     """
-    args = pac.readCommand( sys.argv[1:] ) # Get game components based on input
-    averageScore = pac.runGames( **args )
+    #args = pac.readCommand( sys.argv[1:] ) # Get game components based on input
+    #averageScore = pac.runGames( **args )
 
-    print(averageScore)
+    #print(averageScore)
 
     pass
 
