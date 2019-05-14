@@ -1,25 +1,11 @@
-import pacman as pac
-
-import sys
-
-#------------------------------------------------------------------------------+
-#
-#	Nathan A. Rooy
-#	Simple Particle Swarm Optimization (PSO) with Python
-#	Last update: 2018-JAN-26
-#	Python 3.6
-#
-#------------------------------------------------------------------------------+
-
 #--- IMPORT DEPENDENCIES ------------------------------------------------------+
 
 from __future__ import division
 import random
 import math
+import sys
+import pacman as pac
 
-#--- COST FUNCTION ------------------------------------------------------------+
-
-# we're just aiming for the highest average score, so no special function needed
 
 #--- MAIN ---------------------------------------------------------------------+
 
@@ -41,17 +27,21 @@ class Particle:
         # TO DO:
         # call pac.runGames and run the game with this particle's parameters
         #
-        # base = ["-p", "PacmanQAgent", "-x", "2000", "-n", "2010", "-l", "smallGrid", "-a"]
-        # base.append("epsilon=0.1,alpha=0.3,gamma=0.7")
+        base = ["-p", "PacmanQAgent", "-x", "2000", "-n", "2010", "-l", "smallGrid", "-a"]
+        config = "epsilon=" + str(self.position_i[0]) + ",alpha=" + str(self.position_i[1]) + ",gamma=" + str(self.position_i[2])
+        base.append(config)
+        print(config)
 
-        # args = pac.readCommand( base ) # Get game components based on input    
-        # averageScore = pac.runGames( **args )
+        args = pac.readCommand( base ) # Get game components based on input    
+        averageScore = pac.runGames( **args )
+        
+        #averageScore=random.uniform(1,500)
 
         self.score_i=averageScore      # save the averageScore this iteration had
 
         # check to see if the current position is an individual best
-        if self.score_i<self.score_best_i or self.score_best_i==-1:
-            self.pos_best_i=self.position_i.copy()
+        if self.score_i>self.score_best_i or self.score_best_i==-1:
+            self.pos_best_i=list(self.position_i)
             self.score_best_i=self.score_i
                     
     # update new particle velocity
@@ -97,14 +87,14 @@ class PSO():
         # begin optimization loop
         i=0
         while i<maxiter:
-            if verbose: print(f'iter: {i:>4d}, best solution: {score_best_g:10.6f}')
+            if verbose: print('iter: {}, best solution: {}'.format(i, score_best_g))
             # cycle through particles in swarm and evaluate fitness
             for j in range(0,num_particles):
                 # here we ask the particle to run his values in the game
                 swarm[j].evaluate()
 
                 # determine if current particle is the best (globally)
-                if swarm[j].score_i<score_best_g or score_best_g==-1:
+                if swarm[j].score_i>score_best_g or score_best_g==-1:
                     pos_best_g=list(swarm[j].position_i)
                     score_best_g=float(swarm[j].score_i)
             
@@ -116,8 +106,8 @@ class PSO():
 
         # print final results
         print('\nFINAL SOLUTION:')
-        print(f'   > {pos_best_g}')
-        print(f'   > {score_best_g}\n')
+        print('   > {}'.format(pos_best_g))
+        print('   > {}\n'.format(score_best_g))
 
 if __name__ == "__PSO__":
     main()
