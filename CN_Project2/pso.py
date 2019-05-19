@@ -18,7 +18,7 @@ class Particle:
         self.score_i=-1             # score individual
 
         for i in range(0,num_dimensions):
-            self.velocity_i.append(random.uniform(-1,1))
+            self.velocity_i.append(0)                       # 0 helps avoiding velocity explosion and clamping
             self.position_i.append(random.random())         # generates numbers betweem 0 and 1
 
     # evaluate current fitness
@@ -27,7 +27,7 @@ class Particle:
         # TO DO:
         # call pac.runGames and run the game with this particle's parameters
         #
-        base = ["-p", "PacmanQAgent", "-x", "2000", "-n", "2010", "-l", "smallGrid", "-a"]
+        base = ["-p", "PacmanQAgent", "-x", "2000", "-n", "2100", "-l", "smallGrid", "-q", "-a"]
         config = "epsilon=" + str(self.position_i[0]) + ",alpha=" + str(self.position_i[1]) + ",gamma=" + str(self.position_i[2])
         base.append(config)
         print(config)
@@ -46,9 +46,9 @@ class Particle:
                     
     # update new particle velocity
     def update_velocity(self,pos_best_g):
-        w=0.5       # constant inertia weight (how much to weigh the previous velocity)
-        c1=1        # cognative constant
-        c2=2        # social constant
+        w=0.5          # constant inertia weight (how much to weigh the previous velocity)
+        c1=2.05        # cognative constant
+        c2=2.05        # social constant
         
         for i in range(0,num_dimensions):
             r1=random.random()
@@ -103,6 +103,11 @@ class PSO():
                 swarm[j].update_velocity(pos_best_g)
                 swarm[j].update_position(bounds)
             i+=1
+
+        # print swarm final state
+        print("FINAL SWARM")
+        for s in swarm:
+            print(s.position_i)
 
         # print final results
         print('\nFINAL SOLUTION:')
