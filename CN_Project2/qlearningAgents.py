@@ -85,6 +85,12 @@ class QLearningAgent(ReinforcementAgent):
         legalValues = util.Counter()
         for action in actions:
             legalValues[action] = self.getQValue(state,action)
+
+        # check if biggest value is 0 and random action if it is
+        if legalValues[legalValues.argMax()] == 0:
+            randomAction = random.choice(actions)
+            return randomAction
+
         # return the key which has the biggest value
         return legalValues.argMax()
 
